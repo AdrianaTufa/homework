@@ -1,0 +1,37 @@
+# Tufa Adriana 333 CA
+# Tema 1
+
+	Clasa Device:
+	Pentru sincronizare, clasa device contine cateva obiecte ce vor fi folosite
+de clasa DeviceThread:
+	- o bariera re-entranta pentru ca thread-urile worker sa se astepte la sfarsitul
+	  unui timepoint; (bariera este luata din scheletul de laborator)
+	- un dictionar de lock-uri pentru toate locatiile existente, util la rularea 
+	  scripurilor
+Aceste obiecte sunt create de Device-ul cu id-ul 0, care le trimite celorlalte device-uri
+in metoda setup_devices. Pentru a fi siguri ca obiectele sunt initializate inainte de
+inceperea executiei thread-urilor, se foloseste un event dupa ce acestea sunt setate.
+	In assign_script, un script este introdus intr-un dictionar, la intrarea corespunzatoare
+locatiei sale. La terminarea primirii script-urilor intr-un timepoint, se seteaza un event
+care semnaleaza acest lucru.
+	Clasa Device porneste un singur thread worker.
+
+	Clasa DeviceThread:
+	Este clasa care se ocupa de impartirea si rularea scripturilor.
+	La fiecare timepoint, se asteapta primirea tuturor script-urilor dupa care se verifica
+cate locatii diferite sunt in dictionarul de scripturi. Daca este mai mult de una, se vor
+crea thread-uri ajutatoare. Numarul de thread-uri este egal cu minimul dintre numarul de 
+locatii distincte si 8, pentru ca procesorul pe care va fi rulata aplicatia are 8 core-uri.
+Mai mult de 8 thread-uri ar incetini executia si de asemenea, daca sunt mai putin de 8 locatii
+nu va fi nevoie de 8 thread-uri. Fiecare thread helper si thread-ul parinte inclusiv vor rula
+scripturi pentru una sau mai multe locatii. Locatiile sunt impartite din nr_threads in nr_threads
+din dictionarul de locatii si scripturi existent in clasa Device. Se executa toate scripturile 
+pentru o locatie si apoi se trece la urmatoarea. Am ales sa fac impartirea astfel pentru a nu 
+folosi mai multe obiecte de sincronizare si am presupus ca timpul de rulare a script-urilor este
+relativ egal. Pentru un script, se foloseste lock-ul din clasa Device pentru locatia respectiva 
+pentru a lua date, a rula si a scrie inapoi rezultatele.
+	La terminarea unui timepoint, se distrug thread-urile helper create si se asteapta la bariera.
+
+	Clasa DeviceThreadHelper:
+	Cum am mentionat mai sus, in metoda run se ruleaza scripturile din locatiile corespuncatoare
+thread-ului creat.

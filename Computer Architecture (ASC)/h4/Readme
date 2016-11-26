@@ -1,0 +1,22 @@
+//Tufa Adriana 333 CA
+//Tema 4
+
+
+	Informatiile citite de pe fiecare linie din fisierul de input le pun intr-un
+vector de structuri city. Pentru a face calculele pe GPU, trimit informatiile
+sub forma de array-uri, cate unul pentru latitudine, longitudine, populatie si
+populatie accesibila. Array-urile le aloc si pe CPU si pe GPU, pentru a putea
+copia informatia intre ele. Pentru a face calculele pe GPU, am folosit un thread
+pentru fiecare oras, intrucat nu a fost vorba de un numar foarte mare de orase.
+	Calculul pe GPU (pentru un oras):
+	Prima data calculez care ar fi coordonatele unui patrat ce inscrie cercul
+cu centrul in oras si raza kmrange. Pentru calcule mai exacte am folosit
+formulele descrise in acest articol:
+	http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates
+	Astfel o sa am latitudinea si longitudinea maxima si minima intre care se
+poate afla un oras pentru a fi la o distanta mai mica de kmrange fata de orasul
+curent. Cum aceste coordonate calculate delimiteaza un patrat si nu un cerc,
+un oras ce se afla in interiorul patratului poate fi la o distanta mai mare de
+kmrange. De aceea, pentru fiecare oras care respecta cerinta de mai sus, voi
+calcula distanta exacta pana la orasul curent, si daca e mai mica decat kmrange,
+ii voi aduna populatia la populatia mea accesibila.
